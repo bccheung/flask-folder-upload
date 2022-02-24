@@ -19,9 +19,12 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
-    f = request.files['file1']
-    filename = secure_filename(f.filename)
-    f.save(app.config['UPLOAD_FOLDER'] / filename)
+    files = request.files.getlist('folder')
+    for f in files:
+        # Sanitize filename (could also implement checking for specific file names)
+        filename = secure_filename(f.filename)
+
+        f.save(app.config['UPLOAD_FOLDER'] / filename)
 
     return jsonify({'response': 'success'})
 
