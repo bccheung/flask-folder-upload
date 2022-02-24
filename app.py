@@ -1,10 +1,30 @@
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
+from pathlib import Path
+import shutil
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = Path(__file__).parent / 'uploads'
+if UPLOAD_FOLDER.exists():
+    shutil.rmtree(UPLOAD_FOLDER)
+UPLOAD_FOLDER.mkdir()
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 @app.route('/')
 def index():
-    return '<p>Hello, World</p>'
+    return render_template('index.html')
+
+
+@app.route('/upload', methods=['POST'])
+def upload_files():
+    f = request.files['file1']
+    filename = secure_filename(f.filename)
+    f.save(app.config['UPLOAD_FOLDER'] / filename)
+
+    return jsonify({'response': 'success'})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
